@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VidyaNotes AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#080d1b;
+ color:white;
+}
+header{
+ padding:22px;
+ text-align:center;
+ background:#111a2e;
+ border-bottom:1px solid #293653;
+}
+header h1{color:#8295ff}
+main{max-width:750px;margin:45px auto;padding:18px}
+.card{
+ background:#111a2e;
+ padding:25px;
+ border-radius:18px;
+ border:1px solid #293653;
+}
+input,select,button{
+ width:100%;
+ padding:15px;
+ margin:10px 0;
+ border-radius:10px;
+ border:1px solid #354463;
+ font-size:16px;
+}
+input,select{
+ background:#080d1b;
+ color:white;
+}
+button{
+ background:linear-gradient(90deg,#586cff,#895cf6);
+ color:white;
+ border:0;
+ font-weight:bold;
+}
+#notes{
+ white-space:pre-wrap;
+ line-height:1.8;
+ overflow-wrap:anywhere;
+ margin-top:20px;
+}
+#download{display:none;background:#15803d}
+footer{text-align:center;color:#9ba9c5;padding:25px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>📚 VidyaNotes AI</h1>
+<p>YouTube Video to Smart Study Notes</p>
+</header>
+
+<main>
+<div class="card">
+<h2>🎬 Generate Your Notes</h2>
+
+<label>YouTube Video Link</label>
+<input id="url" placeholder="Paste YouTube link here">
+
+<label>Notes Language</label>
+<select id="language">
+<option>Hindi</option>
+<option>English</option>
+<option>Hinglish</option>
+</select>
+
+<label>Notes Type</label>
+<select id="format">
+<option>Detailed</option>
+<option>Short</option>
+<option>Exam</option>
+</select>
+
+<button id="btn" onclick="generateNotes()">
+✨ Generate AI Notes
+</button>
+
+<p id="status"></p>
+
+<div id="notes"></div>
+
+<button id="download" onclick="downloadPDF()">
+📄 Download PDF
+</button>
+</div>
+</main>
+
+<footer>
+© 2026 VidyaNotes AI | Smart Learning for Everyone
+</footer>
+
+<script>
+async function generateNotes(){
+ const url=document.getElementById("url").value.trim();
+ const language=document.getElementById("language").value;
+ const format=document.getElementById("format").value;
+ const status=document.getElementById("status");
+ const btn=document.getElementById("btn");
+
+ if(!url){
+  status.innerText="Please enter YouTube link!";
+  return;
+ }
+
+ btn.disabled=true;
+ status.innerText="⏳ AI notes bana raha hai...";
+
+ try{
+  const response=await fetch("/api/generate",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({url,language,format})
+  });
+
+  const data=await response.json();
+  if(!response.ok) throw new Error(data.error);
+
+  document.getElementById("notes").innerText=data.notes;
+  document.getElementById("download").style.display="block";
+  status.innerText="✅ Notes ready!";
+
+ }catch(e){
+  status.innerText="❌ "+e.message;
+ }finally{
+  btn.disabled=false;
+ }
+}
+
+function downloadPDF(){
+ window.print();
+}
+</script>
+
+</body>
+</html>
